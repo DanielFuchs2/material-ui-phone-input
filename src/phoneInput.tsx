@@ -1,10 +1,7 @@
 import Button from "@material-ui/core/Button/Button"
 import ClickAwayListener from "@material-ui/core/ClickAwayListener/ClickAwayListener"
 import Grid from "@material-ui/core/Grid/Grid"
-import Input from "@material-ui/core/Input/Input"
 import InputAdornment from "@material-ui/core/InputAdornment/InputAdornment"
-import MenuItem from "@material-ui/core/MenuItem/MenuItem"
-import MenuList from "@material-ui/core/MenuList/MenuList"
 import Paper from "@material-ui/core/Paper/Paper"
 import Popper from "@material-ui/core/Popper/Popper"
 import withStyles from "@material-ui/core/styles/withStyles"
@@ -15,6 +12,8 @@ import * as React from "react"
 import {Country} from "./country"
 import {CountryIcon} from "./countryIcon"
 import {CountryMenuItem} from "./countryMenuItem"
+import {List, ListRowProps} from "react-virtualized"
+import Input from "@material-ui/core/Input/Input";
 
 const sortBy = require("lodash/sortBy")
 
@@ -133,17 +132,22 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
     })
   }
 
-  renderCountry = (country: Country) =>
-    <CountryMenuItem
-      key={country.name}
-      country={country}
-      onClick={this.handleCountryClick}
-      search={this.state.search}
-    />
 
   handleBlur = () => {
     const {onBlur} = this.props
     onBlur && onBlur()
+  }
+
+  rowRenderer = ({index, style}: ListRowProps) => {
+    const {countries} = this.state
+    const country = countries[index]
+    return <CountryMenuItem
+      key={country.name}
+      country={country}
+      style={{...style, boxSizing: "border-box"}}
+      onTap={this.handleCountryClick}
+      search={this.state.search}
+    />
   }
 
   render() {
@@ -181,13 +185,11 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
         <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} placement={"bottom-start"} className={classes.popper}>
           <Paper>
             <ClickAwayListener onClickAway={this.handleClose}>
-              <MenuList className={classes.list}>
-                <MenuItem className={classes.hiddenInput}>
-                  <Input onChange={this.handleSearch} autoFocus disableUnderline
-                         inputProps={{padding: 0}} value={this.state.search}/>
-                </MenuItem>
-                {countries.map(this.renderCountry)}
-              </MenuList>
+              <Input onChange={this.handleSearch} autoFocus disableUnderline
+                     inputProps={{padding: 0}} value={this.state.search}/>
+              <List height={250} rowHeight={36} rowCount={countries.length} width={300}
+                    rowRenderer={this.rowRenderer} overscanRowCount={10}
+              />
             </ClickAwayListener>
           </Paper>
         </Popper>
