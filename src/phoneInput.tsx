@@ -79,14 +79,10 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
   handleChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
     const {onChange} = this.props
     const asYouType = new AsYouType()
-    // console.log("asYouType", e.target.value)
-    // const lastChar = e.target.value.charAt(e.target.value.length-1)
     let phone = asYouType.input(e.target.value)
     const alpha2 = asYouType.country
     const national = asYouType.getNationalNumber()
     const country = lookup.countries({alpha2})[0] || unknownCountry
-    // const newVal = alpha2 ? newphone.replace(country[0].countryCallingCodes[0],
-    //   "(" + country[0].countryCallingCodes[0] + ")") : newphone
     const code = country.countryCallingCodes[0]
     phone = alpha2 ? phone.replace(code, `(${code})`) : phone
     phone = phone.replace(/[^)]\s/g, (match: string) => match.replace(/\s/g, "-"))
@@ -108,7 +104,6 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
   handleSearch = (event: any) => {
     const search = event.target.value
     const countries = allCountries.filter(country => new RegExp(`${search}.*`, "i").test(country.name))
-    console.log("search", search, countries)
     this.setState({
       search,
       countries
@@ -117,7 +112,6 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
 
   handleCountryClick = (country: Country) => {
     const {country: selectedCountry, phone: selectedPhone} = this.state
-
     const currentCallingCode = `(${selectedCountry.countryCallingCodes[0]})`
     const newCallingCode = `(${country.countryCallingCodes[0]})`
     const phone = selectedPhone.indexOf(currentCallingCode) !== -1 ? selectedPhone.replace(
@@ -132,7 +126,6 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
     })
   }
 
-
   handleBlur = () => {
     const {onBlur} = this.props
     onBlur && onBlur()
@@ -145,7 +138,7 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
       key={country.name}
       country={country}
       style={{...style, boxSizing: "border-box"}}
-      onTap={this.handleCountryClick}
+      onSelectCountry={this.handleCountryClick}
       search={this.state.search}
     />
   }
@@ -185,11 +178,13 @@ export class PhoneInput extends React.Component<PhoneInputProps> {
         <Popper open={Boolean(anchorEl)} anchorEl={anchorEl} placement={"bottom-start"} className={classes.popper}>
           <Paper>
             <ClickAwayListener onClickAway={this.handleClose}>
-              <Input onChange={this.handleSearch} autoFocus disableUnderline
-                     inputProps={{padding: 0}} value={this.state.search}/>
-              <List height={250} rowHeight={36} rowCount={countries.length} width={300}
-                    rowRenderer={this.rowRenderer} overscanRowCount={10}
-              />
+              <Paper>
+                <Input onChange={this.handleSearch} autoFocus disableUnderline
+                       inputProps={{padding: 0}} value={this.state.search} className={classes.hiddenInput}/>
+                <List height={250} rowHeight={36} rowCount={countries.length} width={300}
+                      rowRenderer={this.rowRenderer} overscanRowCount={10}
+                />
+              </Paper>
             </ClickAwayListener>
           </Paper>
         </Popper>
