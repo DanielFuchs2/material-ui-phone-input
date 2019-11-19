@@ -13,10 +13,10 @@
       "es2015.promise",
       "es2015.core"
     ],
-    "target": "es2015",
-    "module": "esnext",
+    "target": "es5",
     "declaration": true,
-    "outDir": "build",
+    "rootDir": "src",
+    "outDir": "lib",
     "jsx": "react",
     "importHelpers": true,
     "skipLibCheck": true,
